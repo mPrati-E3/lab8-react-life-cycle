@@ -1,61 +1,69 @@
-import React  from 'react';
+import React from 'react';
 import './App.css';
-import TodoList from './js/TodoList';
-import {OptionalTodoForm} from "./js/TodoForm";
-import NavBar from './js/NavBar';
-import Filters from './js/Filters';
-import API from './js/API';
-
+import Header from './components/Header';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Button from 'react-bootstrap/Button';
+import Collapse from 'react-bootstrap/Collapse';
+import Filters from './components/Filters';
+import TodoList from './components/TodoList';
+import TodoForm from './components/TodoForm';
+import API from './api/API';
 
 class App extends React.Component {
 
-  constructor(props) {
+  constructor(props)  {
     super(props);
-    this.state = {tasks: [], projects: [], mode: 'view', filter: 'All', editedTask: null};
+    this.state = {tasks: [], projects: [], filter: 'All', openMobileMenu: false, modalOpen: false, editedTask: null};
   }
 
-  getProjects(tasks){
+  getProjects(tasks) {
     return [...new Set(tasks.map(task => task.project))];
   }
 
   componentDidMount() {
-    // fake loading the exams from the API server
+    // fake loading the tasks from the API server, and create the projects list
     API.getTasks().then((tasks) => this.setState({tasks: tasks, projects: this.getProjects(tasks)}));
   }
 
-  filterTasks = (filter) => {
-    switch(filter){
-      case 'filter-all':
-          API.getTasks().then((tasks) => this.setState({tasks: tasks, filter: 'All'}));
-          break;
-      case 'filter-important':
-          API.getImportantTasks().then((tasks) => this.setState({tasks: tasks, filter: 'Important'}));
-          break;
-      case 'filter-today':
-          API.getTodayTasks().then((tasks) => this.setState({tasks: tasks, filter: 'Today'}));
-          break;
-      case 'filter-week':
-          API.getWeeklyTasks().then((tasks) => this.setState({tasks: tasks, filter: 'Next Week'}));
-          break;
-      case 'filter-private':
-          API.getPrivateTasks().then((tasks) => this.setState({tasks: tasks, filter: 'Private'}));
-          break;
-      case 'filter-shared':
-          API.getSharedTasks().then((tasks) => this.setState({tasks: tasks, filter: 'Shared'}));
-          break;
-      default:
-          API.getTasks().then((tasks) => this.setState({tasks: tasks, filter: 'All'}));
-          break;
-    }
+  toggleModal = () => {
+    this.setState((state) => ({modalOpen: !state.modalOpen, editedTask: null}));
   }
 
-  deleteTask = (task) => {
-    this.setState((state) => ({tasks: state.tasks.filter((t) => t.id !== task.id)}));
+  showSidebar = () => {
+    this.setState((state) => ({openMobileMenu: !state.openMobileMenu}));
+  }
+
+  filterTasks = (filter, project) => {
+    switch(filter){
+      case 'filter-important':
+        API.getImportantTasks().then((tasks) => this.setState({tasks: tasks, filter: 'Important'}));
+        break;
+      case 'filter-today':
+        API.getTodayTasks().then((tasks) => this.setState({tasks: tasks, filter: 'Today'}));
+        break;
+      case 'filter-week':
+        API.getWeeklyTasks().then((tasks) => this.setState({tasks: tasks, filter: 'Next Week'}));
+        break;
+      case 'filter-private':
+        API.getPrivateTasks().then((tasks) => this.setState({tasks: tasks, filter: 'Private'}));
+        break;
+      case 'filter-shared':
+        API.getSharedTasks().then((tasks) => this.setState({tasks: tasks, filter: 'Shared'}));
+        break;
+      case 'filter-project':
+        API.getByProject(project).then((tasks) => this.setState({tasks: tasks, filter: project}));
+        break;
+      default:
+        API.getTasks().then((tasks) => this.setState({tasks: tasks, filter: 'All'}));
+        break;
+    }
   }
 
   addOrEditTask = (task) => {
     this.setState((state) => {
-      // generate a fake id for newly inserted tasks
+      // add a fake id for properly rendering the list
       if(!task.id)
         task.id = state.tasks.slice(-1)[0].id + 1;
       // remove possible duplicates 
@@ -66,42 +74,38 @@ class App extends React.Component {
       buildState = buildState.sort((a, b) => a.id - b.id);
       return {tasks: buildState};
     });
-    this.setState({mode: 'view'});
   }
 
-  openTaskForm = () => {
-    this.setState({mode: 'add', editedTask: null});
+  editTask = (task) => {
+    this.toggleModal();
+    this.setState({editedTask: task});
   }
 
-  closeTaskForm = () => {
-    this.setState({mode: 'view', editedTask: null});
+  deleteTask = (task) => {
+    this.setState((state) => ({tasks: state.tasks.filter((t) => t.id !== task.id)}));
   }
-
-  requireEditTask = (task) => {
-    this.setState({mode: 'edit', editedTask: task});
-  }
-
+  
   render() {
-    return (
-      <div>
-        <NavBar/>
-        <div className = "container-fluid">
-          <div className="row vheight-100">
-            <aside className="collapse d-sm-block col-sm-4 col-12 bg-light below-nav" id="left-sidebar">
-              <Filters projects = {this.state.projects} filterTasks = {this.filterTasks}/>
-            </aside>
-            <main className="col-sm-8 col-12 below-nav">
-              <h1>{this.state.filter}</h1>
+    return(
+      <>
+        <Header showSidebar={this.showSidebar} />
+        <Container fluid>
+          <Row className="vheight-100">
+            <Collapse in={this.state.openMobileMenu}>
+              <Col sm={4} bg="light" id="left-sidebar" className="collapse d-sm-block below-nav">
+                <Filters projects = {this.state.projects} filterTasks = {this.filterTasks}/>
+              </Col>
+            </Collapse>
+            <Col sm={8} className="below-nav">
+            <h1>{this.state.filter}</h1>
+            <TodoList tasks = {this.state.tasks} editTask = {this.editTask} deleteTask = {this.deleteTask} />
+            <Button variant="success" size="lg" className="fixed-right-bottom" onClick={this.toggleModal}>&#43;</Button>
+            </Col>
 
-              <TodoList tasks = {this.state.tasks} mode={this.state.mode} addOrEditTask = {this.addOrEditTask} requireEditTask = {this.requireEditTask} deleteTask={this.deleteTask} />
-              <OptionalTodoForm mode = {this.state.mode} addOrEditTask = {this.addOrEditTask} editedTask={this.state.editedTask} cancelTask = {this.closeTaskForm}></OptionalTodoForm>
-              {this.state.mode === "view" && (<button type="button" className="btn btn-lg btn-success fixed-right-bottom" onClick = {() => this.openTaskForm()}>&#43;</button>)}
-              {this.state.mode !== "view" && (<button type="button" className="btn btn-lg btn-danger fixed-right-bottom" onClick = {() => this.closeTaskForm()}>X</button>)}
-
-            </main>
-          </div>
-        </div>
-      </div>
+            {this.state.modalOpen && <TodoForm modalOpen={this.state.modalOpen} toggleModal={this.toggleModal} addOrEditTask={this.addOrEditTask} task={this.state.editedTask}/>}
+          </Row>
+        </Container>
+      </>
     );
   }
 }

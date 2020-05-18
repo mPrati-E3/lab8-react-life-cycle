@@ -2,31 +2,31 @@ import moment from 'moment';
 
 let tasks = [
     {
-        "id": 1,
-        "description" : "Complete Lab 3",
-        "important": true,
-        "privateTask": false,
-        "deadline": moment("2020-04-03T11:00:00"),
-        "project": "WebApp I",
-        "completed": true
+        'id': 1,
+        'description' : 'Complete Lab 3',
+        'important': true,
+        'privateTask': false,
+        'deadline': moment('2020-04-03T11:00:00'),
+        'project': 'WebApp I',
+        'completed': true
     },
     {
-        "id": 2,
-        "description" : "Watch Mr. Robot",
-        "important": false,
-        "privateTask": true,
-        "deadline": moment("2020-05-31T18:59:00"),
-        "project": "Personal",
-        "completed": false
+        'id': 2,
+        'description' : 'Watch Mr. Robot',
+        'important': false,
+        'privateTask': true,
+        'deadline': moment('2020-05-31T18:59:00'),
+        'project': 'Personal',
+        'completed': false
     },
     {
-        "id": 3,
-        "description" : "Go for a walk",
-        "important": true,
-        "privateTask": true,
-        "deadline": moment("2020-04-18T08:00:00"),
-        "project": "Personal",
-        "completed": false
+        'id': 3,
+        'description' : 'Go for a walk',
+        'important': true,
+        'privateTask': true,
+        'deadline': moment('2020-04-18T08:00:00'),
+        'project': 'Personal',
+        'completed': false
     }];
 
 
@@ -41,7 +41,7 @@ const isNextWeek = (date) => {
 }
 
 async function getTasks() {
-    return tasks ;
+    return tasks;
 }
 
 async function getImportantTasks() {

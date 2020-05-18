@@ -60,3 +60,7 @@ input:focus:invalid {
 .img-button:hover {
     cursor: pointer; 
 }
+
+.list-title {
+    font-weight: 500;
+}

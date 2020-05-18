@@ -1,26 +1,17 @@
 import React from 'react';
-import moment from 'moment'
+import moment from 'moment';
+import Image from 'react-bootstrap/Image';
+import ListGroup from 'react-bootstrap/ListGroup';
 
 const TodoItem = (props) => {
 
+  let {task, editTask, deleteTask} = props;
 
-  let {task, deleteTask,requireEditTask,addOrEditTask} = props;
-
-  const onChangeTask = (ev,task) => {
-    if(ev.target.cheked) {
-      task.completed = true;
-      addOrEditTask(task);
-    } else {
-      task.completed = false;
-      addOrEditTask(task);
-    }
-  }
   return (
-
-    <li className="list-group-item" id = {task.id}>
-        <div className="d-flex w-100 justify-content-between">
+    <ListGroup.Item id = {task.id}>
+      <div className="d-flex w-100 justify-content-between">
           <div className="custom-control custom-checkbox">
-            <input type="checkbox" className={task.important ? "custom-control-input important" : "custom-control-input"} id={"check-t" +  task.id} defaultChecked = {task.completed} onChange = {(ev) => onChangeTask(ev,task)} />
+            <input type="checkbox" className={task.important ? "custom-control-input important" : "custom-control-input"} id={"check-t" +  task.id + task.important} defaultChecked = {task.completed} />
             <label className="custom-control-label" htmlFor={"check-t" +  task.id}>{task.description}</label>
             <span className="badge badge-success ml-4">{task.project}</span>
           </div>
@@ -35,12 +26,12 @@ const TodoItem = (props) => {
           )}
           
           <div>
-            <img width="20" height="20" className="img-button" src="svg/edit.svg" alt ="" onClick={() => requireEditTask(task)}/>
-            <img width="20" height="20" className="img-button" src="svg/delete.svg" alt ="" onClick = {() => deleteTask(task)}/>
+            <Image width="20" height="20" className="img-button" src="svg/edit.svg" alt ="" onClick={() => editTask(task)}/>
+            <Image width="20" height="20" className="img-button" src="svg/delete.svg" alt ="" onClick={() => deleteTask(task)}/>
           </div>
 
         </div>
-    </li>
+    </ListGroup.Item>
   );
 }
 export default TodoItem;
