@@ -4,7 +4,10 @@ import Button from'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import moment from 'moment';
 
+// Class that describe the optional form opened if I want to modify a task
 class TodoForm extends React.Component {
+
+  // Construct the base information by the given task
   constructor(props) {
     super(props);
     if(this.props.task){
@@ -18,10 +21,12 @@ class TodoForm extends React.Component {
     }
   }
 
+  // Function to change a given field by a given value
   updateField = (name, value) => {
     this.setState({[name]: value});
 }
 
+  // Handle the confirm of the changes by the user
   handleSubmit = (event) => {
     event.preventDefault();
     const form = event.currentTarget;
@@ -40,32 +45,43 @@ class TodoForm extends React.Component {
     }
   }
 
+  // Mandatory render function to draw the form in a Modal way
   render() {
     return(
+
       <Modal show={this.props.modalOpen} onHide={this.props.toggleModal} animation={false}>
+
+        {/* HEADER & TITLE */}
         <Modal.Header closeButton>
           <Modal.Title>Add a Task</Modal.Title>
         </Modal.Header>
+
         <Form method="POST" onSubmit={(event) => this.handleSubmit(event)}>
           <Modal.Body>
+
+            {/* DESCRIPTION */}
             <Form.Group controlId="description">
               <Form.Label>Description</Form.Label>
               <Form.Control type="text" name="description" placeholder="Type a description..." value = {this.state.description} onChange={(ev) => this.updateField(ev.target.name, ev.target.value)} required autoFocus/>
             </Form.Group>
 
+            {/* PROJECT */}
             <Form.Group controlId="project">
               <Form.Label>Project</Form.Label>
               <Form.Control type="text" name="project" placeholder="Type a project for the task..." value = {this.state.project} onChange={(ev) => this.updateField(ev.target.name, ev.target.value)}/>
             </Form.Group>
 
+            {/* IMPORTANT */}
             <Form.Group controlId="important">
               <Form.Check type="checkbox" label="Important" id="important" name="important" checked = {this.state.important} onChange={(ev) => this.updateField(ev.target.name, ev.target.checked)} />
             </Form.Group>
 
+            {/* PRIVATE */}
             <Form.Group controlId="private">
               <Form.Check type="checkbox" label="Private" id="private" name="privateTask" onChange={(ev) => this.updateField(ev.target.name, ev.target.checked)} checked={this.state.privateTask}/>
             </Form.Group>
 
+            {/* DATE */}
             <Form.Group controlId="deadline-date">
               <Form.Label>Deadline</Form.Label>
               <Form.Control type="date" name="deadlineDate" value = {this.state.deadlineDate} onChange={(ev) => this.updateField(ev.target.name, ev.target.value)}/>
@@ -76,6 +92,8 @@ class TodoForm extends React.Component {
             </Form.Group>
 
           </Modal.Body>
+
+          {/* SUBMIT BUTTON */}
           <Modal.Footer>
             <Button variant="primary" type="submit">{this.state.id? 'Update': 'Add'}</Button>
           </Modal.Footer>
